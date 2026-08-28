@@ -1,0 +1,145 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import "tailwindcss";
+
+/* ============================================================
+   BaccaratLive TG Design Tokens (Tailwind CSS v4)
+   ============================================================ */
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Cinzel", "Pretendard Variable", serif;
+
+  --color-base: #06070c;
+  --color-surface: #0a0d15;
+  --color-card: #10141f;
+  --color-elevated: #171c2a;
+  --color-line: rgba(255, 255, 255, 0.07);
+
+  --color-gold: #e3b94e;
+  --color-gold-light: #f7e0a0;
+  --color-gold-deep: #9a7524;
+
+  --color-player: #4ba3f5;
+  --color-banker: #f43f5e;
+  --color-tie: #2fbf71;
+  --color-pairp: #f59e0b;
+  --color-pairb: #a78bfa;
+  --color-dragon: #f97316;
+  --color-panda: #2dd4bf;
+
+  --animate-live-pulse: live-pulse 1.6s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-float: float 5s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.55);
+  }
+  50% {
+    opacity: 0.65;
+    box-shadow: 0 0 0 6px rgba(244, 63, 94, 0);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-base text-zinc-100 font-sans antialiased;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  input,
+  button {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(12, 15, 23, 0.78);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--color-line);
+  }
+  .gold-text {
+    background: linear-gradient(
+      100deg,
+      var(--color-gold-light) 0%,
+      var(--color-gold) 45%,
+      var(--color-gold-deep) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .btn-gold {
+    background: linear-gradient(
+      160deg,
+      var(--color-gold-light),
+      var(--color-gold) 55%,
+      var(--color-gold-deep)
+    );
+    color: #1a1405;
+    box-shadow:
+      0 6px 20px -6px rgba(227, 185, 78, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .btn-gold:active {
+    transform: scale(0.97);
+  }
+  .btn-gold:disabled {
+    filter: grayscale(0.7) brightness(0.6);
+    box-shadow: none;
+  }
+  .shimmer {
+    background: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.4s linear infinite;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .scrollbar-hide {
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .field-input {
+    @apply h-11 w-full rounded-xl border border-line bg-elevated px-3.5 text-sm font-bold text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-gold/50;
+    font-variant-numeric: tabular-nums;
+  }
+}
