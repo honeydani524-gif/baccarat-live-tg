@@ -1,0 +1,257 @@
+BaccaratLive TG
+프로젝트 개발 기준점 및 현재 상태
+===================
+
+[프로젝트 정보]
+
+GitHub Repository:
+https://github.com/honeydani524-gif/baccarat-live-tg
+
+기본 Branch:
+main
+
+현재 기준 Commit:
+a9ef406
+
+기준 Commit의 의미:
+현재까지 로컬 환경에서 정상 동작을 확인하고 GitHub에 Push한
+개발 기준 버전입니다.
+
+============================================================
+[현재 개발 환경]
+==========
+
+OS:
+Windows
+
+Node.js:
+v22.14.0
+
+npm:
+10.9.2
+
+============================================================
+[실행 환경]
+=======
+
+Client:
+Vite
+
+Client URL:
+http://localhost:5173/
+
+Server:
+Node.js / Express
+
+Server URL:
+http://localhost:4000/
+
+Firebase:
+OFF (현재 로컬 개발환경)
+
+Game Engine:
+MOCK_GAME_ENGINE=ON
+
+Environment:
+NODE_ENV=development
+
+============================================================
+[현재 정상 확인된 기능]
+==============
+
+[Client]
+
+* Vite 개발 서버 정상 실행
+* http://localhost:5173/ 접속 정상
+* 로그인 화면 정상
+* 개발 로그인 정상
+* 내 정보 화면 정상
+* DEV 플레이어 표시 정상
+* SUPER_ADMIN 권한 표시 정상
+
+[Server]
+
+* Server 정상 실행
+* Port 4000 정상
+* API 라우팅 정상
+* GET /api/rooms 정상
+* GET /api/staking/pools 정상
+* 인증되지 않은 API 접근 차단 정상
+
+[인증]
+
+개발 로그인 API:
+
+POST /api/auth/telegram
+
+개발 로그인 요청:
+
+{"dev":true}
+
+정상적으로 JWT가 발급되는 것을 확인했습니다.
+
+발급된 JWT를 사용하여:
+
+GET /api/auth/me
+
+요청을 보냈으며 정상적으로 사용자 정보가 반환되는 것을 확인했습니다.
+
+[개발 사용자]
+
+Username:
+dev_player
+
+Display Name:
+DEV 플레이어
+
+Role:
+SUPER_ADMIN
+
+Telegram ID:
+dev-user-0001
+
+============================================================
+[현재 .env 구성]
+============
+
+client/.env
+client/.env.example
+
+server/.env
+server/.env.example
+
+bot/.env.example
+
+실제 .env 파일은 GitHub에 업로드하지 않습니다.
+
+.env.example 파일은 GitHub에 포함합니다.
+
+============================================================
+[Git 보안]
+========
+
+다음 파일 및 정보는 GitHub에 업로드하지 않습니다.
+
+.env
+.env.local
+.env.production
+node_modules/
+Firebase Service Account
+Private Key
+Telegram Bot Token
+JWT Secret
+API Secret
+Database Secret
+Wallet Private Key
+
+다음 파일은 GitHub에 포함합니다.
+
+.env.example
+.gitignore
+README.md
+package.json
+package-lock.json
+Source Code
+
+============================================================
+[현재 GitHub 기준점]
+===============
+
+현재 main Branch의 기준 Commit:
+
+a9ef406
+
+이 Commit을 정상 동작 기준점(Baseline)으로 사용합니다.
+
+앞으로 새로운 기능을 추가할 때 문제가 발생하면
+이 Commit의 상태를 기준으로 변경사항을 비교합니다.
+
+============================================================
+[개발 작업 원칙]
+==========
+
+새로운 기능 추가 전:
+
+1. 현재 Server 정상 실행 확인
+2. 현재 Client 정상 실행 확인
+3. 기존 API 정상 확인
+4. 기존 로그인 정상 확인
+
+새로운 기능 추가 후:
+
+1. 기존 기능 정상 여부 확인
+2. 새로운 기능 테스트
+3. Git status 확인
+4. 민감정보 포함 여부 확인
+5. Commit 생성
+6. GitHub Push
+
+============================================================
+[현재까지 확인한 테스트]
+==============
+
+1. Node.js 버전 확인                    PASS
+2. npm 버전 확인                        PASS
+3. Server npm install                   PASS
+4. Client npm install                   PASS
+5. Server 실행                          PASS
+6. Client 실행                          PASS
+7. Client 브라우저 접속                 PASS
+8. GET /api/rooms                       PASS
+9. GET /api/staking/pools               PASS
+10. 인증 없는 /api/auth/me 차단         PASS
+11. 개발 로그인                         PASS
+12. JWT 발급                            PASS
+13. JWT 인증                            PASS
+14. 사용자 정보 표시                    PASS
+15. Git init                            PASS
+16. GitHub remote 연결                  PASS
+17. GitHub main Push                    PASS
+
+============================================================
+[다음 개발 예정 단계]
+=============
+
+1. Telegram Bot 실행
+2. Bot ↔ Server 연결
+3. Telegram 실제 인증 연동
+4. Socket.io 연결 테스트
+5. 라이브 게임방 테스트
+6. 게임 라운드 진행 테스트
+7. 베팅 기능 테스트
+8. 결과 확정 테스트
+9. 잔액 및 정산 테스트
+10. 충전 기능 테스트
+11. 출금 기능 테스트
+12. Firebase 연결
+13. Production 환경 설정
+
+============================================================
+[중요]
+====
+
+이 파일은 프로젝트의 현재 개발 기준 상태를 기록하기 위한
+참고용 파일입니다.
+
+현재 정상 기준점:
+a9ef406
+
+GitHub의 main Branch를 기준으로 개발을 계속합니다.
+
+실제 운영 환경에 배포하기 전에는 반드시:
+
+* 실제 Telegram Bot Token 설정
+* Firebase 설정
+* Production JWT Secret 생성
+* CORS 설정
+* 실제 지갑 설정
+* 보안 설정
+* 실제 데이터 저장소 설정
+* Production 환경 검증
+
+을 별도로 수행해야 합니다.
+
+============================================================
+마지막 업데이트:
+2026-08-29
+==========
