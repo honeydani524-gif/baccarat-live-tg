@@ -1,0 +1,1635 @@
+BaccaratLive TG
+개발 TODO / ROADMAP
+=================
+
+프로젝트:
+BaccaratLive TG
+
+GitHub Repository:
+https://github.com/honeydani524-gif/baccarat-live-tg
+
+기본 Branch:
+main
+
+현재 정상 기준 Commit:
+a9ef406
+
+기준 문서:
+PROJECT_BASELINE.txt
+
+최종 기획 기준:
+BaccaratLive TG — 최종 종합 기획서 v7.0 FINAL
+
+============================================================
+[이 문서의 목적]
+==========
+
+이 문서는 BaccaratLive TG 프로젝트의 남은 개발 작업을
+실제 소스코드 구조와 현재 구현 상태를 기준으로 관리합니다.
+
+단순한 기능 목록이 아니라,
+
+현재 구현 상태
+→ 선행 작업
+→ 핵심 기능
+→ 연동
+→ 운영
+→ 보안
+→ Production
+
+순서로 개발합니다.
+
+새로운 기능을 추가할 때 기존 기능을 임의로 삭제하거나
+기존 정상 동작을 깨뜨리지 않습니다.
+
+============================================================
+[상태 표기]
+=======
+
+[ ] 예정
+[~] 진행 중
+[✓] 완료
+[!] 문제 / 수정 필요
+[-] 보류
+
+============================================================
+[현재 프로젝트 실제 상태]
+===============
+
+현재 존재하는 주요 구조:
+
+client/
+server/
+bot/
+
+Client 주요 영역:
+
+* AuthContext
+* Telegram Hook
+* Socket Hook
+* Game Hook
+* Live Stream Hook
+* LiveLobby
+* GameRoom
+* BettingSheet
+* BettingConfirmModal
+* BettingTable
+* DealerAdmin
+* HostDashboard
+* AdminDashboard
+* StakingList
+* ProfilePage
+* SupportPage
+
+Server 주요 영역:
+
+* authController
+* roomController
+* betController
+* gameController
+* streamController
+* stakingController
+* depositController
+* withdrawalController
+* adminSettingsController
+* JWT 인증
+* Role 인증
+* Rate Limiting
+* Socket.io
+* Firebase Admin 구조
+* Memory Store
+* Settlement Engine
+* Staking Engine
+
+Bot 주요 영역:
+
+* /start
+* /play
+* /deposit
+* /withdraw
+* /mywallet
+* /history
+* 관리자 Handler
+* 알림 Service
+* Stream Service
+
+============================================================
+[현재까지 실제 확인된 기능]
+================
+
+[✓] Node.js v22.14.0
+
+[✓] npm 10.9.2
+
+[✓] Server npm install
+
+[✓] Client npm install
+
+[✓] Server 실행
+
+[✓] Client 실행
+
+[✓] http://localhost:4000
+
+[✓] http://localhost:5173
+
+[✓] GET /api/rooms
+
+[✓] GET /api/staking/pools
+
+[✓] 인증 없는 /api/auth/me 차단
+
+[✓] 개발 로그인
+
+[✓] JWT 발급
+
+[✓] JWT Bearer 인증
+
+[✓] Client 사용자 정보 표시
+
+[✓] DEV 플레이어 표시
+
+[✓] SUPER_ADMIN 표시
+
+[✓] GitHub Push
+
+[✓] 기준 Commit a9ef406 생성
+
+============================================================
+[IMPORTANT — 현재 프로젝트의 핵심 한계]
+============================
+
+현재 Server는 Firebase가 연결되지 않은 경우
+Memory Store로 동작합니다.
+
+현재 개발환경:
+
+Firebase:
+OFF
+
+Game Engine:
+MOCK_GAME_ENGINE=ON
+
+Database:
+Memory Store
+
+따라서 현재 상태는 Production 시스템이 아니라
+기능 연결을 검증하기 위한 개발 Skeleton입니다.
+
+실제 운영으로 넘어가기 전에 Firebase 및 실제 영속 데이터 저장,
+원자적 잔액 처리, 정산 및 멱등성 처리가 반드시 필요합니다.
+
+============================================================
+PHASE 0
+현재 기준점 보호
+=========
+
+[✓] 기준 Commit a9ef406 확보
+
+[ ] 기준 Commit을 기준으로 새로운 작업 시작
+
+[ ] 작업 전 git status 확인
+
+[ ] 기존 정상 기능 확인
+
+[ ] 기능별 작업 후 별도 Commit 생성
+
+[ ] 문제가 발생하면 마지막 정상 Commit 기준으로 비교
+
+============================================================
+PHASE 1
+프로젝트 구조 및 환경변수 정리
+=================
+
+가장 먼저 처리합니다.
+
+[ ] 전체 import/export 재검사
+
+[ ] 사용하지 않는 파일 재검사
+
+[ ] 사용하지 않는 dependency 확인
+
+[ ] package.json 실제 사용 코드와 대조
+
+[ ] client package-lock 확인
+
+[ ] server package-lock 확인
+
+[ ] bot package-lock 생성 여부 확인
+
+[ ] 실행 script 전체 확인
+
+[ ] .env.example 전체 환경변수 대조
+
+[ ] 실제 코드에서 사용하는 환경변수 전수 검사
+
+[ ] server/.env.example에 MINI_APP_URL 포함 여부 정리
+
+[ ] Telegram 관련 환경변수 정리
+
+[ ] Firebase 관련 환경변수 정리
+
+[ ] Wallet 관련 환경변수 정리
+
+[ ] Customer Support 환경변수 정리
+
+[ ] 환경변수 이름 중복/불일치 제거
+
+[ ] README 실행방법 최신화
+
+[ ] PROJECT_BASELINE.txt 최신화
+
+[ ] TODO_ROADMAP.txt 최신화
+
+완료 기준:
+
+모든 process.env.*
+import.meta.env.*
+가 .env.example과 대응되어야 합니다.
+
+============================================================
+PHASE 2
+실제 Telegram 인증 기반 구축
+====================
+
+현재 개발 로그인은 정상입니다.
+
+다음 단계는 실제 Telegram 인증입니다.
+
+[✓] 개발 로그인
+
+[✓] JWT 발급
+
+[✓] JWT 검증
+
+[ ] Telegram WebApp SDK 확인
+
+[ ] Telegram initData 수신
+
+[ ] Server initData 검증
+
+[ ] Telegram Bot Token 기반 검증
+
+[ ] Telegram 사용자 정보 추출
+
+[ ] 신규 사용자 생성
+
+[ ] 기존 사용자 로그인
+
+[ ] Telegram ID 기준 사용자 식별
+
+[ ] JWT 발급
+
+[ ] Client 세션 유지
+
+[ ] 로그아웃
+
+[ ] 인증 만료 처리
+
+[ ] 잘못된 initData 차단
+
+[ ] 변조된 initData 차단
+
+[ ] Production에서 DEV_AUTH_BYPASS 자동 비활성화 확인
+
+완료 기준:
+
+실제 Telegram Mini App에서
+
+Telegram
+→ Mini App
+→ initData
+→ Server 검증
+→ JWT
+→ Client 로그인
+
+전체 흐름이 정상이어야 합니다.
+
+============================================================
+PHASE 3
+Firebase / 영속 데이터 기반 구축
+=======================
+
+이 단계가 핵심입니다.
+
+현재 Memory Store는 개발용입니다.
+
+[ ] Firebase 프로젝트 연결
+
+[ ] Firebase Admin Service Account 설정
+
+[ ] Firestore 연결
+
+[ ] Realtime Database 연결
+
+[ ] Client Firebase RTDB 연결
+
+[ ] Users 구조 설계
+
+[ ] Rooms 구조 설계
+
+[ ] Rounds 구조 설계
+
+[ ] Bets 구조 설계
+
+[ ] Transactions 구조 설계
+
+[ ] Deposits 구조 설계
+
+[ ] Withdrawals 구조 설계
+
+[ ] Staking Pools 구조 설계
+
+[ ] Staking Participants 구조 설계
+
+[ ] Admin Settings 구조 설계
+
+[ ] Admin Audit 구조 설계
+
+[ ] 데이터 생성/조회/수정 테스트
+
+[ ] Memory Store와 Firebase 동작 경계 명확화
+
+완료 기준:
+
+Server 재시작 후에도 사용자/게임/거래 데이터가
+유실되지 않아야 합니다.
+
+============================================================
+PHASE 4
+금액 시스템 및 원자적 잔액 처리
+==================
+
+기획서 기준:
+
+1 USDT = 1,000,000 micro-USDT
+
+부동소수점 연산 금지.
+
+[✓] moneyUtil 존재
+
+[✓] micro-USDT 구조 존재
+
+[ ] 모든 금액 처리 전수 검사
+
+[ ] Number / Float 기반 금액 처리 제거
+
+[ ] 사용자 잔액 Firestore Transaction 처리
+
+[ ] 거래 기록 생성
+
+[ ] 잔액 변경 원인 기록
+
+[ ] Transaction ID / reference 관리
+
+[ ] 멱등성 키 적용
+
+[ ] 중복 요청 방지
+
+[ ] 음수 잔액 방지
+
+[ ] 동시 요청 테스트
+
+[ ] 잔액 불일치 방지 테스트
+
+완료 기준:
+
+동시에 여러 요청이 들어와도
+잔액이 정확하게 유지되어야 합니다.
+
+============================================================
+PHASE 5
+Socket.io 실제 게임 통신
+==================
+
+현재 Socket.io와 Mock Engine이 존재합니다.
+
+[✓] Socket.io Server
+
+[✓] Socket.io Client Hook
+
+[✓] JWT Socket 인증
+
+[✓] join_room
+
+[✓] leave_room
+
+[✓] Mock Game Engine
+
+[ ] 실제 Server 게임 상태를 Socket과 연결
+
+[ ] round_started
+
+[ ] betting_timer
+
+[ ] betting_closed
+
+[ ] result_pending
+
+[ ] result_confirmed
+
+[ ] settlement_done
+
+[ ] balance_updated
+
+[ ] stream_updated
+
+[ ] stream_offline
+
+[ ] error
+
+[ ] 연결 끊김 처리
+
+[ ] 재연결 처리
+
+[ ] 잘못된 room 접근 차단
+
+[ ] 인증되지 않은 Socket 차단
+
+[ ] 권한 없는 Dealer 이벤트 차단
+
+완료 기준:
+
+Client의 게임 상태가 Server 상태와
+실시간으로 동일하게 유지되어야 합니다.
+
+============================================================
+PHASE 6
+실제 바카라 라운드 상태 머신
+================
+
+기획서 상태:
+
+PREPARING
+BETTING
+CLOSED
+RESULT_PENDING
+SETTLED
+
+[✓] 상태 구조 존재
+
+[✓] Mock 상태 전환 존재
+
+[ ] 실제 Round 데이터 저장
+
+[ ] 라운드 시작
+
+[ ] Betting Open
+
+[ ] Betting Close
+
+[ ] Result Pending
+
+[ ] Result Confirm
+
+[ ] Settlement
+
+[ ] 다음 라운드
+
+[ ] 잘못된 상태 전이 차단
+
+[ ] 이미 종료된 라운드 수정 차단
+
+[ ] 중복 결과 확정 차단
+
+[ ] 중복 정산 차단
+
+[ ] 라운드별 audit 정보 저장
+
+완료 기준:
+
+모든 라운드 상태 변경을 Server가 결정하고
+Client는 Server 상태를 표시만 해야 합니다.
+
+============================================================
+PHASE 7
+실제 베팅 시스템
+=========
+
+기획서의 핵심 기능입니다.
+
+베팅 영역:
+
+PLAYER
+BANKER
+TIE
+P.P
+B.P
+용7
+판다8
+
+[✓] BettingTable
+
+[✓] BettingSheet
+
+[✓] BettingConfirmModal
+
+[✓] ChipSelector
+
+[✓] Server placeBet API
+
+[✓] Server cancelBet API
+
+[✓] 중복 clientBetId 방지 구조
+
+[ ] 실제 Firebase Transaction 잔액 차감
+
+[ ] 실제 Bet 문서 저장
+
+[ ] roundId 연결
+
+[ ] 사용자 ID 연결
+
+[ ] 서버 측 금액 검증
+
+[ ] 최소 베팅 검증
+
+[ ] 최대 베팅 검증
+
+[ ] 현재 라운드 검증
+
+[ ] BETTING 상태 검증
+
+[ ] 베팅 시간 검증
+
+[ ] 잔액 검증
+
+[ ] 멱등성 처리
+
+[ ] 중복 베팅 방지
+
+[ ] 베팅 취소 환불 Transaction
+
+[ ] 베팅 마감 후 요청 차단
+
+[ ] Client UI와 실제 Server 결과 동기화
+
+완료 기준:
+
+Client에서 베팅한 금액이 실제 사용자 잔액에서
+원자적으로 차감되고 Bet 기록이 저장되어야 합니다.
+
+============================================================
+PHASE 8
+딜러 결과 처리 및 실제 정산
+================
+
+기획서상 카드 입력 방식은 사용하지 않습니다.
+
+딜러는 결과 플래그를 선택합니다.
+
+[✓] DealerAdmin 존재
+
+[✓] 결과 선택 구조 존재
+
+[✓] 결과 재확인 구조의 기반 존재
+
+[!] 현재 실제 정산은 아직 완성되지 않음
+
+[ ] 결과 선택 검증 강화
+
+[ ] 결과 확인
+
+[ ] 결과 확정
+
+[ ] 결과 저장
+
+[ ] Settlement Engine 실제 연결
+
+[ ] Firestore Transaction 정산
+
+[ ] PLAYER 정산
+
+[ ] BANKER 정산
+
+[ ] TIE 정산
+
+[ ] P.P 정산
+
+[ ] B.P 정산
+
+[ ] 용7 정산
+
+[ ] 판다8 정산
+
+[ ] 패배 베팅 처리
+
+[ ] 승리 베팅 처리
+
+[ ] 환급/배당 검증
+
+[ ] 정산 Transaction 기록
+
+[ ] settlement_done 이벤트
+
+[ ] balance_updated 이벤트
+
+[ ] 중복 정산 방지
+
+[ ] 정산 완료 후 라운드 SETTLED
+
+[ ] SETTLED 라운드 재정산 차단
+
+완료 기준:
+
+결과 확정 한 번으로
+베팅 결과 → 잔액 → 거래 기록 → 라운드 상태가
+원자적으로 일치해야 합니다.
+
+============================================================
+PHASE 9
+LIVE 로비 및 게임방
+=============
+
+[✓] LiveLobby
+
+[✓] LiveRoomCard
+
+[✓] GameRoom
+
+[✓] Timer
+
+[✓] StreamView
+
+[ ] 실제 Server room 데이터 연결
+
+[ ] 실제 round 데이터 연결
+
+[ ] 게임방 상태 표시
+
+[ ] BETTING 표시
+
+[ ] CLOSED 표시
+
+[ ] RESULT_PENDING 표시
+
+[ ] SETTLED 표시
+
+[ ] 남은 시간 표시
+
+[ ] 게임방 입장
+
+[ ] 비활성 방 접근 차단
+
+[ ] 모바일 세로 UI 검증
+
+============================================================
+PHASE 10
+Firebase Realtime Database 스트리밍
+===============================
+
+기획서 기준:
+
+live/
+└── rooms/
+└── {roomId}/
+├── casinoStream/
+└── tableStream/
+
+[✓] Client Firebase Service
+
+[✓] Stream Hook
+
+[✓] Server Stream Controller
+
+[✓] Stream Socket Event
+
+[ ] 실제 Firebase RTDB 연결
+
+[ ] casinoStream 저장
+
+[ ] tableStream 저장
+
+[ ] LIVE ON/OFF
+
+[ ] URL 관리
+
+[ ] type 관리
+
+[ ] thumbnail 관리
+
+[ ] updatedAt 관리
+
+[ ] Client 실시간 구독
+
+[ ] stream_updated
+
+[ ] stream_offline
+
+[ ] 관리자 스트리밍 수정
+
+[ ] 권한 검증
+
+[ ] 잘못된 URL 처리
+
+[ ] 스트림 끊김 처리
+
+중요 UI 규칙:
+
+메인 카지노 스트림은 베팅창으로 가리지 않습니다.
+
+베팅 중에도 계속 시청할 수 있어야 합니다.
+
+============================================================
+PHASE 11
+Dealer 운영 화면
+============
+
+[✓] DealerAdmin
+
+[✓] Dealer 권한 Middleware
+
+[ ] 실제 게임방 연결
+
+[ ] 현재 회차 표시
+
+[ ] 베팅 마감
+
+[ ] 결과 선택
+
+[ ] 결과 확인
+
+[ ] 결과 확정
+
+[ ] 다음 회차
+
+[ ] 권한 없는 사용자 접근 차단
+
+[ ] 이미 종료된 라운드 조작 차단
+
+[ ] 중복 결과 확정 차단
+
+Dealer에게 제공하지 않는 기능:
+
+* 플레이어 카드 입력
+* 뱅커 카드 입력
+* 카드 수 입력
+* 카드 합계 입력
+* 카드 이미지
+* 전체 베팅 현황
+* 전체 회원 베팅 정보
+
+출목표 기능도 구현하지 않습니다.
+
+============================================================
+PHASE 12
+사용자 잔액 / 내정보
+============
+
+[✓] ProfilePage
+
+[✓] BalanceDisplay
+
+[✓] 충전 UI 기반
+
+[✓] 출금 UI 기반
+
+[ ] 실제 잔액 Firestore 연결
+
+[ ] 거래 내역
+
+[ ] 베팅 내역
+
+[ ] 입금 내역
+
+[ ] 출금 내역
+
+[ ] 스테이킹 참여 내역
+
+[ ] 실시간 balance_updated 반영
+
+[ ] 새로고침 후 잔액 유지
+
+[ ] 재로그인 후 잔액 유지
+
+============================================================
+PHASE 13
+충전 / 입금
+=======
+
+[✓] Deposit Controller
+
+[✓] Deposit API 구조
+
+[✓] Client API 구조
+
+[ ] 실제 입금 데이터 Firestore 저장
+
+[ ] 입금 주소 설정
+
+[ ] 네트워크 설정
+
+[ ] 입금 신청
+
+[ ] 입금 상태 관리
+
+[ ] 관리자 입금 목록
+
+[ ] 관리자 승인
+
+[ ] 관리자 거절
+
+[ ] 승인 시 잔액 Transaction
+
+[ ] 중복 입금 방지
+
+[ ] 거래 기록
+
+[ ] Telegram 관리자 알림
+
+[ ] 입금 상태 실시간 반영
+
+중요:
+
+실제 블록체인 입금 확인 방식은
+Production 단계에서 별도로 검증해야 합니다.
+
+============================================================
+PHASE 14
+출금
+==
+
+[✓] Withdrawal Controller
+
+[✓] Withdrawal API 구조
+
+[✓] Client API 구조
+
+[ ] 실제 출금 데이터 Firestore 저장
+
+[ ] 출금 주소 검증
+
+[ ] 네트워크 검증
+
+[ ] 최소 출금액
+
+[ ] 잔액 검증
+
+[ ] 출금 요청
+
+[ ] 잔액 Hold Transaction
+
+[ ] 관리자 출금 목록
+
+[ ] 관리자 승인
+
+[ ] 관리자 거절
+
+[ ] 승인/거절 상태 관리
+
+[ ] 실제 지급 처리 연동
+
+[ ] 중복 출금 방지
+
+[ ] Transaction 기록
+
+[ ] Telegram 관리자 알림
+
+============================================================
+PHASE 15
+관리자 시스템
+=======
+
+[✓] AdminDashboard
+
+[✓] Role Middleware
+
+[✓] Admin Settings API
+
+[ ] 실제 회원 관리
+
+[ ] 회원 검색
+
+[ ] 회원 상태 변경
+
+[ ] 권한 변경
+
+[ ] Dealer 관리
+
+[ ] Host 관리
+
+[ ] 게임방 관리
+
+[ ] 게임 설정
+
+[ ] 최소 베팅
+
+[ ] 최대 베팅
+
+[ ] 베팅 시간
+
+[ ] 충전 관리
+
+[ ] 출금 관리
+
+[ ] 스트리밍 관리
+
+[ ] 스테이킹 관리
+
+[ ] 지갑 설정
+
+[ ] 고객센터 설정
+
+[ ] 관리자 Audit Log
+
+============================================================
+PHASE 16
+Telegram Bot
+============
+
+Bot은 핵심 Server/Database 흐름이 안정된 후
+실제 연동을 진행합니다.
+
+[✓] Bot 기본 구조
+
+[✓] /start
+
+[✓] /play
+
+[✓] /deposit
+
+[✓] /withdraw
+
+[✓] /mywallet
+
+[✓] /history
+
+[✓] Admin Handler
+
+[✓] Notify Service
+
+[✓] Stream Service
+
+[ ] Bot Token 설정
+
+[ ] Bot 실행
+
+[ ] BotFather Mini App 설정
+
+[ ] MINI_APP_URL 설정
+
+[ ] /start 실제 테스트
+
+[ ] Mini App 버튼 연결
+
+[ ] /play 실제 연결
+
+[ ] /deposit 실제 연결
+
+[ ] /withdraw 실제 연결
+
+[ ] /mywallet 실제 연결
+
+[ ] /history 실제 연결
+
+[ ] 관리자 알림
+
+[ ] 관리자 승인
+
+[ ] 관리자 거절
+
+[ ] 스트리밍 관리
+
+[ ] Bot 오류 처리
+
+[ ] Bot 재시작 정책
+
+============================================================
+PHASE 17
+Staking
+=======
+
+[✓] StakingList
+
+[✓] Staking API 기본 구조
+
+[✓] Pool 생성 구조
+
+[✓] Pool Join 구조
+
+[ ] 실제 Firebase Pool 저장
+
+[ ] 실제 참여금액 Transaction
+
+[ ] 최소 참여금액
+
+[ ] 최대 참여금액
+
+[ ] 방장/운영자 권한
+
+[ ] 중도 해지 가능 여부
+
+[ ] 풀 상태
+
+[ ] 운영 종료
+
+[ ] 최종 정산
+
+[ ] 참여자별 지급
+
+[ ] 수익 계산
+
+[ ] Transaction 기록
+
+[ ] 중복 참여/중복 요청 방지
+
+[ ] 관리자 관리
+
+============================================================
+PHASE 18
+미니게임
+====
+
+기획서 기준:
+
+2열 × 3행
+
+[✓] MiniGames 페이지
+
+[ ] 실제 미니게임 데이터 구조
+
+[ ] 게임 목록
+
+[ ] 게임 상태
+
+[ ] 게임 실행 구조
+
+[ ] 필요 시 Server 연동
+
+[ ] 향후 게임 추가가 가능한 배열 기반 구조
+
+주의:
+
+바카라 핵심 게임/정산 기능이 안정되기 전에
+미니게임을 과도하게 확장하지 않습니다.
+
+============================================================
+PHASE 19
+고객센터
+====
+
+[✓] SupportPage
+
+[ ] 실제 고객센터 Telegram Username 설정
+
+[ ] 환경변수 연결 확인
+
+[ ] @ 제거/포맷 검증
+
+[ ] Telegram 링크 테스트
+
+[ ] 관리자 고객센터 설정
+
+[ ] Production 값 확인
+
+============================================================
+PHASE 20
+보안 강화
+=====
+
+핵심 기능이 연결된 이후 반드시 수행합니다.
+
+[ ] Production JWT_SECRET 생성
+
+[ ] Telegram Token Secret 관리
+
+[ ] Firebase Service Account 보안
+
+[ ] Private Key 보호
+
+[ ] API Secret 보호
+
+[ ] Wallet Secret 보호
+
+[ ] CORS Production 설정
+
+[ ] CSP 설정
+
+[ ] Rate Limit 재검토
+
+[ ] 관리자 권한 Server 검증
+
+[ ] Dealer 권한 Server 검증
+
+[ ] Host 권한 Server 검증
+
+[ ] 금액 Server 검증
+
+[ ] 베팅 시간 Server 검증
+
+[ ] 중복 요청 방지
+
+[ ] 멱등성 키
+
+[ ] Transaction 무결성
+
+[ ] 민감정보 로그 제거
+
+[ ] JWT 만료 검증
+
+[ ] 잘못된 Token 차단
+
+[ ] Secret Scan
+
+[ ] GitHub History 민감정보 검사
+
+============================================================
+PHASE 21
+통합 테스트
+======
+
+[ ] 신규 Telegram 사용자 로그인
+
+[ ] 기존 Telegram 사용자 로그인
+
+[ ] 사용자 정보
+
+[ ] 잔액 조회
+
+[ ] LIVE 로비
+
+[ ] 게임방 입장
+
+[ ] Socket 연결
+
+[ ] 라운드 시작
+
+[ ] 베팅 시작
+
+[ ] 베팅
+
+[ ] 베팅 확인
+
+[ ] 베팅 마감
+
+[ ] 결과 선택
+
+[ ] 결과 확인
+
+[ ] 결과 확정
+
+[ ] 정산
+
+[ ] 잔액 업데이트
+
+[ ] 다음 회차
+
+[ ] 베팅 취소
+
+[ ] 충전
+
+[ ] 출금
+
+[ ] 관리자 승인
+
+[ ] 관리자 거절
+
+[ ] 스테이킹
+
+[ ] Bot 알림
+
+[ ] 스트리밍 변경
+
+[ ] Socket 재연결
+
+============================================================
+PHASE 22
+동시성 / 장애 테스트
+============
+
+[ ] 동시에 여러 명 베팅
+
+[ ] 동일 사용자의 중복 베팅
+
+[ ] 동일 요청 재전송
+
+[ ] 동일 결과 중복 확정
+
+[ ] 동일 정산 중복 실행
+
+[ ] 잔액 동시 변경
+
+[ ] Socket 재연결
+
+[ ] Server 재시작
+
+[ ] Firebase 일시 장애
+
+[ ] 네트워크 끊김
+
+[ ] Client 새로고침
+
+[ ] Browser 종료 후 재접속
+
+[ ] Bot 재시작
+
+============================================================
+PHASE 23
+Production 준비
+=============
+
+[ ] DEV_AUTH_BYPASS=false
+
+[ ] MOCK_GAME_ENGINE=false
+
+[ ] NODE_ENV=production
+
+[ ] Production Firebase
+
+[ ] Production Database
+
+[ ] Production Telegram Bot
+
+[ ] Production JWT Secret
+
+[ ] Production CORS
+
+[ ] HTTPS
+
+[ ] Domain
+
+[ ] Netlify Client
+
+[ ] Render Server
+
+[ ] Render Bot
+
+[ ] Logging
+
+[ ] Monitoring
+
+[ ] Backup
+
+[ ] Error Tracking
+
+============================================================
+PHASE 24
+최종 GitHub / 납품 검수
+=================
+
+[ ] 전체 import/export 검사
+
+[ ] 사용하지 않는 파일 검사
+
+[ ] 사용하지 않는 dependency 검사
+
+[ ] npm audit 확인
+
+[ ] package-lock 최신화
+
+[ ] .env.example 최신화
+
+[ ] .env GitHub 미포함
+
+[ ] node_modules 미포함
+
+[ ] Firebase Service Account 미포함
+
+[ ] Private Key 미포함
+
+[ ] Telegram Token 미포함
+
+[ ] Wallet Private Key 미포함
+
+[ ] README 최신화
+
+[ ] PROJECT_BASELINE.txt 최신화
+
+[ ] TODO_ROADMAP.txt 최신화
+
+[ ] Production 설정 확인
+
+[ ] 전체 테스트 완료
+
+[ ] Git status 확인
+
+[ ] Git diff 확인
+
+[ ] Commit 생성
+
+[ ] GitHub Push
+
+[ ] GitHub Repository 최종 확인
+
+============================================================
+[개발 우선순위]
+=========
+
+현재부터는 다음 순서를 우선합니다.
+
+1. 환경변수 / 프로젝트 구조 정리
+2. 실제 Telegram 인증
+3. Firebase / 영속 데이터
+4. 금액 / 잔액 Transaction
+5. Socket.io 실제 게임 상태
+6. 바카라 라운드 상태 머신
+7. 실제 베팅
+8. 실제 정산
+9. LIVE / GameRoom 완성
+10. Firebase 스트리밍
+11. Dealer 운영
+12. 사용자 내정보 / 거래내역
+13. 충전
+14. 출금
+15. 관리자 시스템
+16. Telegram Bot
+17. Staking
+18. 미니게임
+19. 고객센터
+20. 보안 강화
+21. 통합 테스트
+22. 동시성 / 장애 테스트
+23. Production
+24. 최종 GitHub 검수
+
+============================================================
+[현재 진행 위치]
+==========
+
+완료:
+
+PHASE 0
+기준점 확보
+
+기본 개발환경
+
+기본 Client
+
+기본 Server
+
+기본 Bot Skeleton
+
+개발 인증
+
+JWT
+
+기본 API
+
+GitHub Push
+
+현재 가장 먼저 진행할 작업:
+
+PHASE 1
+프로젝트 구조 및 환경변수 정리
+
+그 다음:
+
+PHASE 2
+실제 Telegram 인증
+
+그 다음:
+
+PHASE 3
+Firebase / 영속 데이터
+
+그 다음:
+
+PHASE 4
+금액 및 원자적 잔액 처리
+
+이후:
+
+PHASE 5~8
+Socket → 게임 상태 → 베팅 → 정산
+
+============================================================
+[코드작성 AI 작업 원칙]
+===============
+
+코드작성 AI에게 작업을 요청할 때 반드시 다음을 지킵니다.
+
+1.
+
+현재 TODO_ROADMAP.txt의 현재 진행 위치를 먼저 확인합니다.
+
+2.
+
+PROJECT_BASELINE.txt의 기준 Commit을 확인합니다.
+
+3.
+
+최종 기획서 v7.0 FINAL을 기능 기준으로 사용합니다.
+
+4.
+
+이미 구현된 기능을 다시 만들지 않습니다.
+
+5.
+
+새 기능 구현 전에 관련 기존 파일을 먼저 검사합니다.
+
+6.
+
+필요한 파일만 수정합니다.
+
+7.
+
+새로운 중복 구조를 만들지 않습니다.
+
+8.
+
+기존 API와 Socket 이벤트를 임의로 변경하지 않습니다.
+
+9.
+
+금액은 micro-USDT 정수로 처리합니다.
+
+10.
+
+잔액 변경은 Server에서만 처리합니다.
+
+11.
+
+최종 베팅 확정은 Server에서 검증합니다.
+
+12.
+
+Client에서 권한을 결정하지 않습니다.
+
+13.
+
+관리자/Dealer 권한은 Server에서 검증합니다.
+
+14.
+
+실제 Secret을 코드에 넣지 않습니다.
+
+15.
+
+.env.example을 변경하면 실제 코드의 환경변수 사용도 함께 확인합니다.
+
+16.
+
+새 기능 구현 후 기존 기능을 다시 테스트합니다.
+
+17.
+
+작업 완료 후 변경 파일 목록을 알려줍니다.
+
+18.
+
+테스트 결과를 알려줍니다.
+
+19.
+
+TODO_ROADMAP.txt의 완료 항목을 업데이트합니다.
+
+20.
+
+작업이 정상적으로 완료되면 Git Commit을 생성합니다.
+
+============================================================
+[절대 구현하지 않는 기능]
+===============
+
+다음 기능은 최종 기획 기준상 구현하지 않습니다.
+
+출목표
+
+Roadmap.jsx
+
+roadmap 컬렉션
+
+roadmap API
+
+roadmap_updated 이벤트
+
+비드로드
+
+빅로드
+
+중국점
+
+카드 덱 생성
+
+카드 셔플
+
+플레이어 카드 입력
+
+뱅커 카드 입력
+
+플레이어 카드 합계
+
+뱅커 카드 합계
+
+카드 수 입력
+
+카드 기반 자동 결과 판정 UI
+
+딜러 전체 베팅 현황
+
+딜러 전체 회원 베팅 정보
+
+GPT 딜러 대사
+
+DealerChat
+
+============================================================
+[핵심 제품 흐름]
+==========
+
+최종 목표:
+
+Telegram
+↓
+Bot
+↓
+Mini App
+↓
+Telegram initData 검증
+↓
+JWT
+↓
+메인 화면
+↓
+LIVE
+↓
+게임방
+↓
+카지노 메인 스트림
++
+테이블 스트림
+↓
+베팅하기
+↓
+Bottom Sheet
+↓
+칩 선택
+↓
+베팅 영역 선택
+↓
+베팅 확인
+↓
+최종 베팅
+↓
+Server 검증
+↓
+잔액 차감
+↓
+베팅 저장
+↓
+베팅 마감
+↓
+Dealer 결과 선택
+↓
+결과 확인
+↓
+결과 확정
+↓
+Server Transaction
+↓
+정산
+↓
+잔액 업데이트
+↓
+다음 회차
+
+============================================================
+[완료 판정 기준]
+==========
+
+기능이 화면에 보인다고 완료 처리하지 않습니다.
+
+다음 조건을 모두 만족해야 [✓]로 변경합니다.
+
+1. Client 구현
+2. Server 구현
+3. 필요한 Database 구현
+4. 권한 검증
+5. 입력값 검증
+6. 오류 처리
+7. 중복 요청 처리
+8. 실제 실행 테스트
+9. 기존 기능 회귀 테스트
+10. 필요한 문서 업데이트
+
+============================================================
+[현재 기준]
+=======
+
+정상 기준 Commit:
+
+a9ef406
+
+현재 Branch:
+
+main
+
+현재 단계:
+
+PHASE 1 — 프로젝트 구조 및 환경변수 정리
+
+다음 핵심 목표:
+
+실제 Telegram 인증
+→ Firebase 영속 데이터
+→ Transaction 기반 잔액
+→ Socket 게임
+→ 베팅
+→ 정산
+
+============================================================
+마지막 업데이트
+========
+
+# 2026-08-29
