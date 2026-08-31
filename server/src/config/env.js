@@ -28,7 +28,7 @@ export const env = {
     .map((s) => s.trim())
     .filter(Boolean),
   devAuthBypass: process.env.DEV_AUTH_BYPASS === "true" && !isProd,
-  mockGameEngine: process.env.MOCK_GAME_ENGINE !== "false",
+  mockGameEngine: !isProd && process.env.MOCK_GAME_ENGINE !== "false",
   logLevel: process.env.LOG_LEVEL || (isProd ? "info" : "debug"),
   minStakeMicro: Number(process.env.MIN_STAKE_AMOUNT) || 100_000_000,
   maxStakeMicro: Number(process.env.MAX_STAKE_AMOUNT) || 5_000_000_000,
