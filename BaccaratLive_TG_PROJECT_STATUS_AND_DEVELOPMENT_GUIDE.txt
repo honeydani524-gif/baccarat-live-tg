@@ -1,0 +1,552 @@
+# BaccaratLive TG — 프로젝트 현재 상태 및 실제 개발 진행 기준
+
+작성일: 2026-08-31
+GitHub: https://github.com/honeydani524-gif/baccarat-live-tg
+기준 브랜치: main
+현재 Git 기준 Commit: 7e0af85
+
+============================================================
+1. 문서 목적
+============================================================
+
+현재까지 구현·검증된 상태를 기록하고, 앞으로는 개발용 Mock/Skeleton을
+계속 확장하는 방식이 아니라 실제 서비스에 필요한 기능을 하나씩
+Production 수준으로 완성하기 위한 기준 문서입니다.
+
+개발 원칙:
+- 기존 소스코드를 먼저 확인하고 이미 구현된 기능은 중복 작성하지 않습니다.
+- Mock 기능은 최종 기능으로 간주하지 않습니다.
+- 실제 인증 → 실제 DB → 실제 잔액 → 실제 게임 상태 → 실제 베팅 → 실제 정산 순서로 진행합니다.
+- 한 단계의 구현과 테스트가 끝난 뒤 다음 단계로 이동합니다.
+- 보안, 권한, 오류 처리, 중복 요청 방지도 각 기능과 함께 검토합니다.
+
+============================================================
+2. 현재 프로젝트 구조
+============================================================
+
+baccarat-live-tg/
+├── .gitignore
+├── README.md
+├── PROJECT_BASELINE.txt
+├── TODO_ROADMAP.txt
+├── package.json
+├── package-lock.json
+├── client/
+├── server/
+├── bot/
+└── src/
+
+client/ : React + Vite 기반 Telegram Mini App
+server/ : Express + Socket.io + Firebase Admin 연결 구조
+bot/    : Telegram Bot / Telegraf 구조
+
+주요 Client:
+- AuthContext / Telegram Hook
+- LIVE Lobby / Game Room
+- Betting UI
+- Staking UI
+- Admin / Dealer / Host 화면
+- API / Socket / Firebase Client 연결 구조
+
+주요 Server:
+- Telegram 인증 Controller
+- JWT / Role Middleware
+- Rate Limiting
+- Room / Bet / Game / Stream / Staking API
+- Deposit / Withdrawal API
+- Socket.io
+- Memory Store
+- Settlement / Staking Engine 기반
+- Firebase Admin 연결 구조
+- micro-USDT 금액 유틸리티
+
+주요 Bot:
+- /start
+- /play
+- /deposit
+- /withdraw
+- /mywallet
+- /history
+- 관리자 Handler
+- Notification / Stream Service
+
+============================================================
+3. 현재까지 실제 확인된 상태
+============================================================
+
+환경:
+- Node.js v22.14.0
+- npm 10.9.2
+
+GitHub:
+- Repository: https://github.com/honeydani524-gif/baccarat-live-tg
+- main 브랜치 사용
+- 현재 기준 Commit: 7e0af85
+- Commit: fix: disable mock game engine in production
+
+Server:
+- npm install 완료
+- Express 서버 정상 실행
+- http://localhost:4000 실행 확인
+- GET /api/rooms HTTP 200
+- GET /api/staking/pools HTTP 200
+- Socket.io 초기화 정상
+- Firebase OFF
+- Memory Store 사용
+- Development에서는 MOCK_GAME_ENGINE 사용 가능
+- Production에서는 mockGameEngine 강제 false
+
+인증:
+- 개발 로그인 성공
+- JWT 발급 성공
+- Bearer 인증 성공
+- GET /api/auth/me 성공
+- Client 내정보 화면에서 개발 사용자 표시 확인
+
+Client:
+- npm install 완료
+- Vite 실행 성공
+- http://localhost:5173/ 접속 확인
+- 개발 로그인 후 내정보 화면 확인
+- npm run build PASS
+
+============================================================
+3-A. 2026-08-31 PHASE 1 검수 기록
+============================================================
+
+이번 세션에서 실제 로컬 소스와 GitHub main을 기준으로 다음을 검증했습니다.
+
+Git:
+- main branch
+- working tree clean
+- origin/main Push 완료
+- 기준 Commit: 7e0af85
+
+Server syntax:
+- server/src/server.js node --check PASS
+- server/src/**/*.js 전체 node --check PASS
+
+Client:
+- client npm run build PASS
+- Vite production build 성공
+- chunk size warning은 존재하지만 기능 오류는 아님
+
+API:
+- GET /api/rooms → HTTP 200
+- GET /api/staking/pools → HTTP 200
+
+Socket:
+- Socket.io 초기화 PASS
+
+Import/Export:
+- Server 전체 import/export 1차 검수
+- Server 실제 부팅을 통해 핵심 module loading 오류 없음 확인
+- routes/api.js의 import 가독성 이슈는 기능 오류가 아니므로 불필요한 수정은 하지 않음
+
+Environment:
+server/src/config/env.js 변경:
+
+mockGameEngine: !isProd && process.env.MOCK_GAME_ENGINE !== "false"
+
+검증:
+- Development + MOCK_GAME_ENGINE=true → mockGameEngine=true PASS
+- Production + MOCK_GAME_ENGINE=true → mockGameEngine=false PASS
+
+Commit:
+7e0af85 fix: disable mock game engine in production
+
+변경 파일:
+server/src/config/env.js
+
+변경 목적:
+Production에서는 환경변수로 Mock Game Engine을 실수로 활성화할 수 없도록 합니다.
+
+============================================================
+4. 현재 프로젝트의 정확한 단계
+============================================================
+
+현재 상태는:
+
+개발용 Skeleton + API/Client 연결 + 개발 인증 + Mock 게임 기반
+
+입니다.
+
+아직 Production 완성 상태가 아닙니다.
+
+미완료 핵심:
+- 실제 Telegram Mini App initData 인증
+- 실제 Firebase 영속화
+- 실제 잔액 원자적 처리
+- 실제 Round 상태 머신
+- 실제 베팅 Transaction
+- 실제 결과 정산
+- 실제 입출금 운영 처리
+- 실제 Bot 연동
+- Production 보안 및 운영 검증
+
+============================================================
+5. 앞으로의 개발 방식
+============================================================
+
+모든 기능은 다음 순서로 진행합니다.
+
+1. 실제 소스코드 검사
+2. 기존 Mock/임시 구현 확인
+3. Production 구조 설계
+4. 코드 구현
+5. 테스트
+6. Client/API 실제 동작 확인
+7. 완료 기록
+8. Git Commit
+9. 다음 기능으로 이동
+
+한 번에 전체 기능을 만들지 않습니다.
+
+============================================================
+6. 실제 개발 우선순위
+============================================================
+
+PHASE 1 — 구조 및 환경변수 확정
+
+이번 세션에서 확인 완료:
+[✓] 전체 Server JavaScript syntax 검사
+[✓] server.js syntax 검사
+[✓] Client production build
+[✓] Server 실제 실행
+[✓] 기본 API 응답
+[✓] Socket.io 초기화
+[✓] Server import/export 1차 검수
+[✓] env.js Production Mock Engine 차단
+[✓] Git diff --check
+[✓] GitHub commit / push
+
+아직 남은 PHASE 1:
+[ ] client/server/bot package.json 전체 대조
+[ ] process.env 전수 검사
+[ ] import.meta.env 전수 검사
+[ ] .env.example 전체 대조
+[ ] .gitignore / Secret 노출 최종 검사
+[ ] dependency 중복/미사용 검사
+[ ] Client API ↔ Server Route 1:1 최종 대조
+[ ] Bot ↔ Server API 연결 최종 대조
+[ ] README / ROADMAP / STATUS 문서와 실제 소스 최종 대조
+
+PHASE 1 전체 완료 후에만 PHASE 2로 이동합니다.
+
+------------------------------------------------------------
+PHASE 2 — 실제 Telegram 인증
+- Telegram Mini App initData 검증
+- signature/hash 검증
+- auth_date 검증
+- 사용자 식별
+- 회원 생성/조회
+- 실제 인증 세션/JWT
+- 개발 bypass는 Production 경로에서 제거
+
+흐름:
+Telegram Mini App
+→ initData
+→ Server 검증
+→ Telegram user 식별
+→ User 생성/조회
+→ 인증 세션
+→ Client
+
+------------------------------------------------------------
+PHASE 3 — 실제 Firebase 영속화
+Memory Store를 Production DB 구조로 교체합니다.
+
+주요 데이터 후보:
+users
+rooms
+rounds
+bets
+transactions
+deposits
+withdrawals
+stakingPools
+stakingPositions
+adminSettings
+streams
+auditLogs
+
+------------------------------------------------------------
+PHASE 4 — 실제 잔액 / 금액 시스템
+현재 단위:
+1 USDT = 1,000,000 micro-USDT
+
+필수:
+- 잔액 조회
+- 입금 반영
+- 출금 차감
+- 베팅 차감
+- 승리 정산
+- 환불
+- 동시성 제어
+- Transaction
+- 중복 처리 방지
+- 음수 잔액 방지
+
+------------------------------------------------------------
+PHASE 5 — 실제 Baccarat Round 상태 머신
+Mock Game Engine을 실제 Server 권한 기반 Engine으로 교체합니다.
+
+정확한 상태명은 실제 소스와 요구사항을 대조한 뒤 확정합니다.
+
+Client는 결과를 결정하지 않고 Server가 최종 게임 상태를 관리합니다.
+
+------------------------------------------------------------
+PHASE 6 — 실제 베팅
+- 베팅 가능 시간
+- 최소/최대 금액
+- 잔액 확인
+- 금액 차감
+- Bet 저장
+- Round 연결
+- 취소 조건
+- 중복 요청 방지
+- 동시성 제어
+
+------------------------------------------------------------
+PHASE 7 — 실제 결과 확정 / 정산
+- Baccarat 결과 확정
+- 지원 베팅 타입별 배당
+- 승리/패배 처리
+- 환불
+- 잔액 반영
+- Transaction
+- 멱등성
+- 중복 정산 방지
+- Audit Log
+
+------------------------------------------------------------
+PHASE 8 — 실제 Socket.io
+- Round 상태
+- Timer
+- 베팅 상태
+- 결과
+- 정산
+- LIVE 상태
+- 재접속
+- Socket 인증
+- 권한 검증
+
+------------------------------------------------------------
+PHASE 9 — 실제 입금 / 출금
+입금:
+사용자 → 주소 안내 → TX Hash 제출 → 검증 → 거래 기록 → 잔액 반영
+
+출금:
+사용자 → 요청 → 잔액/한도 확인 → 승인/처리 → Blockchain TX → 완료
+
+Private Key는 절대 소스코드에 넣지 않습니다.
+
+------------------------------------------------------------
+PHASE 10 — Telegram Bot 실제 연동
+기존 command 구조를 실제 Server API와 연결합니다.
+
+- /start
+- /play
+- /deposit
+- /withdraw
+- /mywallet
+- /history
+- 사용자 식별
+- 입출금 알림
+- 게임 알림
+- 관리자 알림
+- 오류 알림
+
+------------------------------------------------------------
+PHASE 11 — 관리자 / Dealer / Host 권한
+실제 요구사항에 따라 Role을 확정합니다.
+
+예:
+USER
+HOST
+DEALER
+ADMIN
+SUPER_ADMIN
+
+Client 화면 숨김만으로 권한을 구현하지 않고 Server에서 최종 검증합니다.
+
+------------------------------------------------------------
+PHASE 12 — 보안 / 운영 안정화
+- Rate Limit
+- Authentication
+- Authorization
+- Input Validation
+- CORS
+- XSS 등 웹 보안
+- Secret 관리
+- Audit Log
+- Error Handling
+- Idempotency
+- Transaction
+- Socket 인증
+- 관리자 보안
+- Production 환경변수
+- 장애/재접속 처리
+
+============================================================
+7. 반드시 유지할 핵심 원칙
+============================================================
+
+1. Client는 게임 결과를 결정하지 않습니다.
+2. Server가 게임 상태의 최종 권한을 가집니다.
+3. 잔액은 Server에서만 최종 변경합니다.
+4. 금액 계산에서 부동소수점 오류를 피합니다.
+5. micro-USDT 단위를 일관되게 사용합니다.
+6. 베팅과 잔액 변경은 Transaction 기준입니다.
+7. 정산은 멱등성을 보장합니다.
+8. 동일 거래의 중복 처리를 방지합니다.
+9. Secret/Token/Private Key를 GitHub에 올리지 않습니다.
+10. 개발용 bypass를 Production 인증으로 사용하지 않습니다.
+11. Mock과 실제 데이터를 명확히 구분합니다.
+12. 기능 하나를 실제 테스트까지 완료한 뒤 다음 기능으로 이동합니다.
+
+============================================================
+8. 개발 모드와 실제 개발의 구분
+============================================================
+
+초기 테스트에서 사용한:
+DEV_AUTH_BYPASS=true
+MOCK_GAME_ENGINE=true
+
+는 개발 편의를 위한 설정입니다.
+
+Production에서는:
+- DEV_AUTH_BYPASS는 사용하지 않습니다.
+- mockGameEngine은 코드상 강제로 false입니다.
+
+목표:
+DEV_AUTH_BYPASS
+→ 실제 Telegram 인증
+
+MOCK_GAME_ENGINE
+→ 실제 Baccarat Round Engine
+
+============================================================
+9. Git 기준
+============================================================
+
+작업 시작:
+git status
+git log --oneline -5
+
+현재 기준점:
+7e0af85 fix: disable mock game engine in production
+
+수정 후:
+git status
+git diff
+
+test 완료 후:
+git add .
+git status
+git commit -m "type: description"
+git push
+
+작은 기능 단위로 Commit합니다.
+
+============================================================
+10. 다음 작업 — 가장 먼저 할 것
+============================================================
+
+다음 작업은 새로운 UI나 Mock 기능 추가가 아닙니다.
+
+PHASE 1의 남은 실제 소스 대조를 완료합니다.
+
+검사 순서:
+1. client package.json
+2. server package.json
+3. bot package.json
+4. 모든 import/export
+5. process.env 사용 위치
+6. import.meta.env 사용 위치
+7. .env.example
+8. .gitignore
+9. 실제 실행 스크립트
+10. 미사용/중복 dependency
+11. Client API ↔ Server Route
+12. Bot ↔ Server API
+13. 문서와 실제 소스 차이
+
+PHASE 1 완료 후에만 PHASE 2로 이동합니다.
+
+============================================================
+11. GPT 프로젝트에서 이 문서를 사용하는 방법
+============================================================
+
+이 프로젝트를 이어서 작업하는 AI는 반드시:
+
+1. 이 문서를 읽습니다.
+2. README.md를 읽습니다.
+3. PROJECT_BASELINE.txt를 읽습니다.
+4. TODO_ROADMAP.txt를 읽습니다.
+5. 실제 소스코드를 직접 확인합니다.
+6. 문서와 소스가 다르면 소스의 실제 상태를 보고합니다.
+7. 이미 완료된 기능을 다시 구현하지 않습니다.
+8. 현재 PHASE의 작업만 진행합니다.
+9. 구현 후 테스트 방법과 결과를 기록합니다.
+10. 완료된 작업을 Git Commit 단위로 남깁니다.
+
+============================================================
+12. Production 완료 판단
+============================================================
+
+다음 항목은 실제 테스트까지 통과해야 Production 완료로 판단합니다.
+
+[ ] 실제 Telegram 인증
+[ ] 실제 Firebase 영속화
+[ ] 사용자 데이터 영속화
+[ ] 실제 잔액 Transaction
+[ ] 실제 거래 기록
+[ ] 실제 Round Engine
+[ ] 실제 베팅
+[ ] 실제 정산
+[ ] 정산 멱등성
+[ ] Socket 실시간 동기화
+[ ] 입금 처리
+[ ] 출금 처리
+[ ] Telegram Bot 실연동
+[ ] 관리자 권한 검증
+[ ] Dealer 권한 검증
+[ ] Audit Log
+[ ] Secret 관리
+[ ] Rate Limit
+[ ] Production 환경변수
+[ ] 장애/재접속 처리
+[ ] 통합 테스트
+[ ] 운영 배포 테스트
+
+============================================================
+13. 한 줄 요약
+============================================================
+
+현재 BaccaratLive TG는
+
+Client + Server + Bot 기본 구조가 구축되고
+개발 로그인/JWT/API/Client 실행/Mock 게임 기반까지 검증된 상태입니다.
+
+2026-08-31 기준 새로운 Git 기준점은 7e0af85입니다.
+
+앞으로는
+
+PHASE 1 남은 구조/환경변수/연결 검수
+→ 실제 Telegram 인증
+→ 실제 Firebase
+→ 실제 잔액
+→ 실제 Round
+→ 실제 베팅
+→ 실제 정산
+→ 실시간 통신
+→ 입출금
+→ Bot
+→ 관리자
+→ 보안/운영
+→ Production
+
+순서로 하나씩 완성합니다.
+
+끝.
