@@ -11,11 +11,12 @@ https://github.com/honeydani524-gif/baccarat-live-tg
 main
 
 현재 기준 Commit:
-a9ef406
+7e0af85
 
 기준 Commit의 의미:
-현재까지 로컬 환경에서 정상 동작을 확인하고 GitHub에 Push한
-개발 기준 버전입니다.
+2026-08-31 PHASE 1 검수에서 확인된 최신 정상 기준 버전입니다.
+Production에서 Mock Game Engine이 강제로 비활성화되도록 env.js를 수정하고
+로컬 테스트 및 GitHub Push까지 완료한 상태입니다.
 
 ============================================================
 [현재 개발 환경]
@@ -50,7 +51,8 @@ Firebase:
 OFF (현재 로컬 개발환경)
 
 Game Engine:
-MOCK_GAME_ENGINE=ON
+Development에서는 MOCK_GAME_ENGINE 사용 가능
+Production에서는 강제로 false
 
 Environment:
 NODE_ENV=development
@@ -63,11 +65,11 @@ NODE_ENV=development
 
 * Vite 개발 서버 정상 실행
 * http://localhost:5173/ 접속 정상
-* 로그인 화면 정상
 * 개발 로그인 정상
 * 내 정보 화면 정상
 * DEV 플레이어 표시 정상
 * SUPER_ADMIN 권한 표시 정상
+* npm run build PASS
 
 [Server]
 
@@ -76,95 +78,81 @@ NODE_ENV=development
 * API 라우팅 정상
 * GET /api/rooms 정상
 * GET /api/staking/pools 정상
-* 인증되지 않은 API 접근 차단 정상
+* Socket.io 초기화 정상
+* server/src 전체 JavaScript node --check PASS
+* server/src/server.js node --check PASS
 
 [인증]
 
-개발 로그인 API:
+* 개발 로그인 성공
+* JWT 발급 성공
+* Bearer 인증 성공
+* GET /api/auth/me 성공
 
-POST /api/auth/telegram
+[환경변수 안전성]
 
-개발 로그인 요청:
+server/src/config/env.js의:
+mockGameEngine: !isProd && process.env.MOCK_GAME_ENGINE !== "false"
 
-{"dev":true}
+검증 결과:
 
-정상적으로 JWT가 발급되는 것을 확인했습니다.
+Development + MOCK_GAME_ENGINE=true
+→ mockGameEngine=true PASS
 
-발급된 JWT를 사용하여:
+Production + MOCK_GAME_ENGINE=true
+→ mockGameEngine=false PASS
 
-GET /api/auth/me
-
-요청을 보냈으며 정상적으로 사용자 정보가 반환되는 것을 확인했습니다.
-
-[개발 사용자]
-
-Username:
-dev_player
-
-Display Name:
-DEV 플레이어
-
-Role:
-SUPER_ADMIN
-
-Telegram ID:
-dev-user-0001
+Production에서 Mock Game Engine이 환경변수로 강제 활성화되지 않습니다.
 
 ============================================================
-[현재 .env 구성]
-============
-
-client/.env
-client/.env.example
-
-server/.env
-server/.env.example
-
-bot/.env.example
-
-실제 .env 파일은 GitHub에 업로드하지 않습니다.
-
-.env.example 파일은 GitHub에 포함합니다.
-
-============================================================
-[Git 보안]
-========
-
-다음 파일 및 정보는 GitHub에 업로드하지 않습니다.
-
-.env
-.env.local
-.env.production
-node_modules/
-Firebase Service Account
-Private Key
-Telegram Bot Token
-JWT Secret
-API Secret
-Database Secret
-Wallet Private Key
-
-다음 파일은 GitHub에 포함합니다.
-
-.env.example
-.gitignore
-README.md
-package.json
-package-lock.json
-Source Code
-
-============================================================
-[현재 GitHub 기준점]
+[Git 기준점]
 ===============
 
-현재 main Branch의 기준 Commit:
+현재 main Branch:
+7e0af85 fix: disable mock game engine in production
 
-a9ef406
+이 Commit을 현재 개발 기준점으로 사용합니다.
 
-이 Commit을 정상 동작 기준점(Baseline)으로 사용합니다.
+이전 기준:
+f5d77bf docs: update README with current project status
 
-앞으로 새로운 기능을 추가할 때 문제가 발생하면
-이 Commit의 상태를 기준으로 변경사항을 비교합니다.
+변경 파일:
+server/src/config/env.js
+
+변경 내용:
+- mockGameEngine이 production에서 true가 될 수 있는 기존 조건을 수정
+- production에서는 항상 false
+- development에서는 MOCK_GAME_ENGINE 설정을 계속 사용할 수 있음
+
+============================================================
+[PHASE 1 현재 검수 상태]
+===============
+
+[✓] 전체 Server JavaScript syntax 검사
+[✓] server.js syntax 검사
+[✓] Client production build
+[✓] Server 실제 실행
+[✓] GET /api/rooms
+[✓] GET /api/staking/pools
+[✓] Socket.io 초기화
+[✓] Server import/export 1차 연결 검수
+[✓] env.js Production Mock Engine 차단 검증
+[✓] Git diff --check
+[✓] GitHub commit
+[✓] GitHub push
+
+아직 PHASE 1 전체 완료로 판단하지 않습니다.
+
+남은 검수:
+[ ] client/server/bot package.json 전체 대조
+[ ] process.env 전수 검사
+[ ] import.meta.env 전수 검사
+[ ] .env.example 전수 대조
+[ ] .gitignore/Secret 노출 최종 검사
+[ ] 미사용/중복 dependency 검사
+[ ] Client API ↔ Server Route 1:1 최종 대조
+[ ] Bot ↔ Server API 연결 최종 대조
+[ ] README / ROADMAP / STATUS 문서와 실제 소스 최종 대조
 
 ============================================================
 [개발 작업 원칙]
@@ -175,7 +163,8 @@ a9ef406
 1. 현재 Server 정상 실행 확인
 2. 현재 Client 정상 실행 확인
 3. 기존 API 정상 확인
-4. 기존 로그인 정상 확인
+4. 기존 인증 정상 확인
+5. 실제 소스와 문서를 대조
 
 새로운 기능 추가 후:
 
@@ -187,71 +176,52 @@ a9ef406
 6. GitHub Push
 
 ============================================================
-[현재까지 확인한 테스트]
-==============
-
-1. Node.js 버전 확인                    PASS
-2. npm 버전 확인                        PASS
-3. Server npm install                   PASS
-4. Client npm install                   PASS
-5. Server 실행                          PASS
-6. Client 실행                          PASS
-7. Client 브라우저 접속                 PASS
-8. GET /api/rooms                       PASS
-9. GET /api/staking/pools               PASS
-10. 인증 없는 /api/auth/me 차단         PASS
-11. 개발 로그인                         PASS
-12. JWT 발급                            PASS
-13. JWT 인증                            PASS
-14. 사용자 정보 표시                    PASS
-15. Git init                            PASS
-16. GitHub remote 연결                  PASS
-17. GitHub main Push                    PASS
-
-============================================================
-[다음 개발 예정 단계]
+[다음 개발 단계]
 =============
 
-1. Telegram Bot 실행
-2. Bot ↔ Server 연결
-3. Telegram 실제 인증 연동
-4. Socket.io 연결 테스트
-5. 라이브 게임방 테스트
-6. 게임 라운드 진행 테스트
-7. 베팅 기능 테스트
-8. 결과 확정 테스트
-9. 잔액 및 정산 테스트
-10. 충전 기능 테스트
-11. 출금 기능 테스트
-12. Firebase 연결
-13. Production 환경 설정
+PHASE 1 남은 검수를 먼저 완료합니다.
+
+PHASE 1 전체 완료 후:
+
+PHASE 2 — 실제 Telegram Mini App initData 인증
+
+순서:
+
+Telegram Mini App
+→ initData
+→ Server 검증
+→ Telegram user 식별
+→ User 생성/조회
+→ JWT
+→ Client 세션
+
+그 이후:
+
+PHASE 3 Firebase 영속화
+→ PHASE 4 실제 잔액/Transaction
+→ PHASE 5 실제 Round Engine
+→ PHASE 6 실제 베팅
+→ PHASE 7 실제 정산
+→ PHASE 8 Socket 실시간 동기화
+→ PHASE 9 입출금
+→ PHASE 10 Telegram Bot
+→ PHASE 11 권한
+→ PHASE 12 보안/운영
 
 ============================================================
 [중요]
 ====
 
-이 파일은 프로젝트의 현재 개발 기준 상태를 기록하기 위한
-참고용 파일입니다.
+현재 정상 기준점은 Production 완성본이 아닙니다.
 
-현재 정상 기준점:
-a9ef406
+Firebase OFF / Memory Store / 개발 인증 / Mock Game Engine은
+현재 개발 환경의 상태입니다.
 
-GitHub의 main Branch를 기준으로 개발을 계속합니다.
-
-실제 운영 환경에 배포하기 전에는 반드시:
-
-* 실제 Telegram Bot Token 설정
-* Firebase 설정
-* Production JWT Secret 생성
-* CORS 설정
-* 실제 지갑 설정
-* 보안 설정
-* 실제 데이터 저장소 설정
-* Production 환경 검증
-
-을 별도로 수행해야 합니다.
+실제 운영 전에는 반드시 실제 Telegram 인증,
+Firebase 영속화, 원자적 잔액 처리, 실제 Round/Bet/Settlement,
+입출금, Bot, 권한, 보안 및 운영 검증을 완료해야 합니다.
 
 ============================================================
 마지막 업데이트:
-2026-08-29
+2026-08-31
 ==========
